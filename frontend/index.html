@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Voting System</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+:root {
+  --primary-color: #002060;
+  --secondary-color: #004080;
+  --accent-color: #28a745;
+  --background-color: #F2F2F2;
+  --text-color: #333;
+  --white: #FFFFFF;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* Header */
+header {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 15px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+header img {
+  height: 50px;
+  vertical-align: middle;
+  margin-right: 15px;
+  transition: var(--transition);
+}
+
+header img:hover {
+  transform: scale(1.05);
+}
+
+header h1 {
+  display: inline;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* Footer */
+footer {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.container:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Navigation Bar */
+nav {
+  background-color: var(--secondary-color);
+  padding: 15px;
+  text-align: center;
+}
+
+nav a {
+  color: var(--white);
+  text-decoration: none;
+  margin: 0 15px;
+  font-weight: bold;
+  transition: var(--transition);
+  position: relative;
+}
+
+nav a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background-color: var(--white);
+  transition: var(--transition);
+}
+
+nav a:hover::after {
+  width: 100%;
+}
+
+/* Forms */
+form {
+  margin: 30px 0;
+}
+
+input, button, select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #DDD;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: var(--transition);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.2);
+}
+
+button {
+  background-color: var(--accent-color);
+  color: var(--white);
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+/* Alert Banner */
+.alert-banner {
+  background-color: #FFD700;
+  color: #000;
+  padding: 15px 20px;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  nav {
+    padding: 10px;
+  }
+
+  nav a {
+    display: block;
+    margin: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 10px;
+  }
+
+  header img {
+    height: 40px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  input, button, select {
+    padding: 10px;
+  }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <img src="vo.png" alt="Government Logo">
+        <h1>Election Comission of India</h1>
+    </header>
+
+    <!-- Alert Banner -->
+    <div class="alert-banner">
+        Voting closes on <strong>15th August 2024</strong>. Ensure you are registered!
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">FAQs</a>
+        <a href="#">Contact Us</a>
+    </nav>
+    <!-- Authentication Section -->
+    <div class="container" id="authPage">
+        <h1>Authenticate Voter</h1>
+        <input type="text" id="docNumber" placeholder="Enter Aadhaar or PAN Number" />
+        <button onclick="authenticateWithDocument()">Authenticate</button>
+    </div>
+
+    <!-- Registration Section -->
+    <div class="container" id="registrationPage" style="display:none;">
+        <h1>Register Voter</h1>
+        <p id="voterAddress"></p>
+        <button onclick="registerVoter()">Register</button>
+    </div>
+
+    <!-- Voting Section -->
+    <div class="container" id="votingPage" style="display:none;">
+        <h1>Voting</h1>
+        <button onclick="loadCandidates()">Load Candidates</button>
+        <div id="candidates"></div>
+        <h2>Results</h2>
+        <div id="results"></div>
+    </div>
+    <footer>
+        &copy; 2024 Government of India. All rights reserved. | Privacy Policy | Terms of Use
+    </footer>
+
+    <script>
+        const backendAPI = "http://localhost:5000/verify-document"; // Backend API endpoint
+        const contractAddress ="0x40A708725fA6A56e1FA6a75D25d12911e87567a4"; // Replace with your contract address
+        const contractABI = [
+    {
+        "inputs": [
+            {
+                "internalType": "string[]",
+                "name": "candidateNames",
+                "type": "string[]"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "admin",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getAllCandidates",
+        "outputs": [
+            {
+                "internalType": "string[]",
+                "name": "",
+                "type": "string[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_candidate",
+                "type": "string"
+            }
+        ],
+        "name": "getVotes",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_voter",
+                "type": "address"
+            }
+        ],
+        "name": "registerVoter",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_candidate",
+                "type": "string"
+            }
+        ],
+        "name": "vote",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "isRegistered",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "hasVoted",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
+
+
+        const web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        let authenticatedAddress = "";
+
+        // Authentication
+        async function authenticateWithDocument() {
+            const docNumber = document.getElementById("docNumber").value.trim();
+            if (!docNumber) {
+                alert("Please enter your Aadhaar or PAN number.");
+                return;
+            }
+
+            try {
+                const response = await fetch(backendAPI, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ docNumber }),
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    authenticatedAddress = data.address;
+                    document.getElementById("authPage").style.display = "none";
+                    document.getElementById("registrationPage").style.display = "block";
+                    document.getElementById("voterAddress").innerText = `Voter Ethereum Address: ${authenticatedAddress}`;
+                } else {
+                    alert(data.message || "Authentication failed.");
+                }
+            } catch (error) {
+                console.error("Authentication Error:", error.message);
+                alert("An error occurred while verifying your document.");
+            }
+        }
+
+        // Registration
+        async function registerVoter() {
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const adminAddress = accounts[0];
+                await contract.methods.registerVoter(authenticatedAddress).send({ from: adminAddress });
+                alert(`Voter ${authenticatedAddress} registered successfully!`);
+                document.getElementById("registrationPage").style.display = "none";
+                document.getElementById("votingPage").style.display = "block";
+            } catch (error) {
+                console.error("Registration Error:", error.message);
+                alert("Failed to register voter.");
+            }
+        }
+
+        // Load Candidates and Results
+        async function loadCandidates() {
+            const candidatesContainer = document.getElementById("candidates");
+            const resultsContainer = document.getElementById("results");
+
+            candidatesContainer.innerHTML = "";
+            resultsContainer.innerHTML = "";
+
+            try {
+                const candidates = await contract.methods.getAllCandidates().call();
+
+                for (const candidate of candidates) {
+                    const votes = await contract.methods.getVotes(candidate).call();
+
+                    const candidateItem = document.createElement("div");
+                    candidateItem.className = "candidate-item";
+                    candidateItem.innerHTML = `
+                        ${candidate}
+                        <button onclick="vote('${candidate}')">Vote</button>
+                    `;
+                    candidatesContainer.appendChild(candidateItem);
+
+                    const resultItem = document.createElement("div");
+                    resultItem.className = "result-item";
+                    resultItem.innerHTML = `${candidate}: ${votes} votes`;
+                    resultsContainer.appendChild(resultItem);
+                }
+            } catch (error) {
+                console.error("Error loading candidates or results:", error.message);
+                alert("Failed to load candidates.");
+            }
+        }
+
+        // Cast Vote
+        async function vote(candidate) {
+            try {
+                const isRegistered = await contract.methods.isRegistered(authenticatedAddress).call();
+                if (!isRegistered) {
+                    alert("You are not registered to vote.");
+                    return;
+                }
+
+                const hasVoted = await contract.methods.hasVoted(authenticatedAddress).call();
+                if (hasVoted) {
+                    alert("You have already voted.");
+                    return;
+                }
+
+                await contract.methods.vote(candidate).send({ from: authenticatedAddress, gas: 300000 });
+                alert(`Successfully voted for ${candidate}!`);
+                loadCandidates(); // Refresh results
+            } catch (error) {
+                console.error("Voting Error:", error.message);
+                alert("Failed to cast vote.");
+            }
+        }
+    </script>
+</body>
+</html>
