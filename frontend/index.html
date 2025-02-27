@@ -253,8 +253,20 @@ button:hover {
     </footer>
 
     <script>
+    
+     window.watsonAssistantChatOptions = {
+    integrationID: "53edc3db-555a-4920-af0d-53c8eba9f3c0", // The ID of this integration.
+    region: "au-syd", // The region your integration is hosted in.
+    serviceInstanceID: "8e076679-4b9c-41a1-a30e-9487c33e96bd", // The ID of your service instance.
+    onLoad: async (instance) => { await instance.render(); }
+  };
+  setTimeout(function(){
+    const t=document.createElement('script');
+    t.src="https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + (window.watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
+    document.head.appendChild(t);
+  });
         const backendAPI = "http://localhost:5000/verify-document"; // Backend API endpoint
-        const contractAddress ="0x40A708725fA6A56e1FA6a75D25d12911e87567a4"; // Replace with your contract address
+        const contractAddress ="0x2666261D628134c2f879D5072Ba1639E5134bf8f"; // Replace with your contract address
         const contractABI = [
     {
         "inputs": [
